@@ -1,0 +1,101 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    // NOTE: Do not use '~' in UNIX-like OSes, use ${userHome}, this the reference for variables
+    //       https://code.visualstudio.com/docs/editor/variables-reference#_predefined-variables
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Requires:
+            // - https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools
+            "name": "(gdb) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            // Resolved by CMake Tools:
+            "program": "${command:cmake.launchTargetPath}",
+            "args": [],
+            "cwd": "${command:cmake.launchTargetDirectory}",
+            "stopAtEntry": false,
+            "environment": [
+                {
+                    // add the directory where our target was built to the PATHs
+                    // it gets resolved by CMake Tools:
+                    "name": "PATH",
+                    "value": "${env:PATH}:${command:cmake.launchTargetDirectory}"
+                }{
+                    // See https://go.microsoft.com/fwlink/?LinkId=827846 to learn about workspace recommendations.
+                    // Extension identifier format: ${publisher}.${name}. Example: vscode.csharp
+                
+                    // List of extensions which should be recommended for users of this workspace.
+                    "recommendations": [
+                        "ms-vscode.cmake-tools",
+                        "vadimcn.vscode-lldb",
+                    ],
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    // https://sourceware.org/gdb/onlinedocs/gdb/Forks.html
+                    "description": "Fork follows Parent process, switch to child for debugging child",
+                    "text": "set follow-fork-mode parent",
+                    "ignoreFailures": true
+                },
+                {
+                    // https://sourceware.org/gdb/onlinedocs/gdb/Forks.html
+                    "description": "Fork will drop the other process attached to debugger",
+                    "text": "set detach-on-fork on",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            // Requires:
+            // - https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools
+            // - https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb
+            "name": "(lldb) Launch",
+            "type": "lldb",
+            "request": "launch",
+            // Resolved by CMake Tools:
+            "program": "${command:cmake.launchTargetPath}",
+            "args": [],
+            "cwd": "${command:cmake.launchTargetDirectory}",
+            "terminal": "integrated",
+            "stopOnEntry": false,
+            "env": {
+                "PATH": "${env:PATH}:${command:cmake.launchTargetDirectory}"
+            },
+            "initCommands": [
+                "settings set target.process.follow-fork-mode parent"
+            ]
+        },
+        {
+            "name": "(cppvsdbg) Launch",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${command:cmake.launchTargetPath}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${command:cmake.launchTargetDirectory}",
+            "environment": [
+                {
+                    // Bug in Windows Debugger ${env:PATH}
+                    // add the directory where our target was built to the PATHs
+                    // it gets resolved by CMake Tools:
+                    "name": "PATH",
+                    "value": "%PATH%;${command:cmake.launchTargetDirectory}"
+                }
+            ],
+            // Windows debugging is very slow and is way faster in the "Debug Console"
+            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+    ]
+}
