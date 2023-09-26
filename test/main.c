@@ -885,9 +885,8 @@ UTEST(executable_resolve, missing_from_path) {
 }
 #endif
 
-#if !defined(_MSC_VER)
 UTEST(executable_resolve, default_search_path) {
-  const char *const commandLine[] = {"ls", 0};
+  const char *const commandLine[] = {"git", "--help", 0};
   struct subprocess_s process;
   int ret = -1;
 
@@ -900,7 +899,6 @@ UTEST(executable_resolve, default_search_path) {
 
   ASSERT_EQ(0, subprocess_destroy(&process));
 }
-#endif
 
 UTEST(create, subprocess_option_no_window) {
   const char *const commandLine[] = {"./process_return_zero", 0};

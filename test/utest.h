@@ -283,25 +283,26 @@ UTEST_EXTERN struct utest_state_s utest_state;
 #pragma clang diagnostic pop
 #endif
 
-#ifdef _MSC_VER
-#define UTEST_SNPRINTF(BUFFER, N, ...) _snprintf_s(BUFFER, N, N, __VA_ARGS__)
-#else
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wvariadic-macros"
 #pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
 #endif
+#ifdef _MSC_VER
+#define UTEST_SNPRINTF(BUFFER, N, ...) _snprintf_s(BUFFER, N, N, __VA_ARGS__)
+#else
 #define UTEST_SNPRINTF(...) snprintf(__VA_ARGS__)
+#endif
 #ifdef __clang__
 #pragma clang diagnostic pop
-#endif
 #endif
 
 #if defined(__cplusplus)
 /* if we are using c++ we can use overloaded methods (its in the language) */
 #define UTEST_OVERLOADABLE
-#elif defined(__clang__)
+#elif defined(__clang__) && !defined(_MSC_VER)
 /* otherwise, if we are using clang with c - use the overloadable attribute */
+/* CMAKE_CXX_SIMULATE_ID/CMAKE_C_SIMULATE_ID is GNU on Windows */
 #define UTEST_OVERLOADABLE __attribute__((overloadable))
 #endif
 
@@ -398,7 +399,15 @@ utest_type_printer(long long unsigned int i) {
    we don't have the ability to print the values we got, so we create a macro
    to tell our users we can't do anything fancy
 */
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wvariadic-macros"
+#pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
+#endif
 #define utest_type_printer(...) UTEST_PRINTF("undef")
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 #endif
 
 #ifdef _MSC_VER
