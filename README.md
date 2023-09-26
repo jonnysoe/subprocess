@@ -190,6 +190,27 @@ if (0 != result) {
 This option is _only required_ on Windows platforms at present if the behaviour
 is seeked for.
 
+### Launching a Synchronous Process
+
+To launch a synchornous process you call `subprocess_exec` like so:
+
+```c
+const char *command_line[] = {"echo", "\"Hello, world!\"", NULL};
+int result = subprocess_exec(command_line, 0, &subprocess);
+if (0 != result) {
+  // an error occurred!
+}
+```
+
+Likewise, you specify an array of string for the command line - terminating the 
+array with a `NULL` element.
+
+If the process is executed successfully then 0 is returned from 
+`subprocess_exec`.
+
+Unlike `subprocess_create`, this does not have the flexibility to interact with 
+standard streams.
+
 ## FAQs
 
 ### Why does my process not inherit the environment of the parent when `environment` is `NULL`?
@@ -207,6 +228,14 @@ If you spawn a process that needs internet access then you will have to use the
 has to inherit the environment of the parent because the environment implicitly
 contains the privileges of the parent process (accessing the internet) that the
 child requires.
+
+### Why does GDB hang upon calling `subprocess_create`?
+
+Like any `fork` and `exec` function calls, GDB could not hold the process when 
+it was replaced by `exec`, so `detach-on-fork` needs to be turned on:
+```
+set detach-on-fork on
+```
 
 ## Todo
 

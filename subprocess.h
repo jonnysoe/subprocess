@@ -170,6 +170,15 @@ subprocess_weak int subprocess_join(struct subprocess_s *const process,
 /// the parent process.
 subprocess_weak int subprocess_destroy(struct subprocess_s *const process);
 
+/// @brief Synchronous wrapper to create a process.
+/// @param command_line An array of strings for the command line to execute for
+/// this process. The last element must be NULL to signify the end of the array.
+/// The memory backing this parameter only needs to persist until this function
+/// returns.
+/// @return On success zero is returned.
+/// @note Do not "step over" this function in debugger, run to next line instead.
+subprocess_weak int subprocess_exec(const char *const command_line[]);
+
 /// @brief Terminate a previously created process.
 /// @param process The process to terminate.
 /// @return On success zero is returned.
@@ -1019,6 +1028,17 @@ int subprocess_destroy(struct subprocess_s *const process) {
 #endif
 
   return 0;
+}
+
+int subprocess_exec(const char *const commandLine[]) {
+  struct subprocess_s process;
+  int ret = subprocess_create(commandLine,
+                              subprocess_option_inherit_environment,
+                              &process);
+  subprocess_join(&process, &ret);
+  subprocess_destroy(&process);
+
+  return ret;
 }
 
 int subprocess_terminate(struct subprocess_s *const process) {
