@@ -1033,7 +1033,8 @@ int subprocess_destroy(struct subprocess_s *const process) {
 int subprocess_exec(const char *const commandLine[]) {
   struct subprocess_s process;
   int ret = subprocess_create(commandLine,
-                              subprocess_option_inherit_environment,
+                              (subprocess_option_inherit_environment |
+                               subprocess_option_search_user_path),
                               &process);
   subprocess_join(&process, &ret);
   subprocess_destroy(&process);
